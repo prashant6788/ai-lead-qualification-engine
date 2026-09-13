@@ -11,13 +11,28 @@ A runnable reference implementation showing how AI-assisted interpretation can b
 [![Python](https://img.shields.io/badge/Python-3.10%2B-blue)](#requirements)
 [![FastAPI](https://img.shields.io/badge/FastAPI-REST%20API-009688)](#api)
 [![Tests](https://img.shields.io/badge/Tests-pytest-orange)](#testing)
-[![CI](https://img.shields.io/badge/CI-GitHub%20Actions-2088FF)](#testing)
+[![CI](https://img.shields.io/badge/CI-GitHub%20Actions-2088FF)](#continuous-integration)
+[![Release](https://img.shields.io/badge/Release-v1.0.0-success)](https://github.com/prashant6788/ai-lead-qualification-engine/releases/tag/v1.0.0)
 [![License](https://img.shields.io/badge/License-MIT-yellow)](LICENSE)
+
+<br>
 
 **Maintained by [Prashant Rajput](https://github.com/prashant6788)**  
 Founder, [Touchstone Infotech](https://www.touchstoneinfotech.com/)
 
 </div>
+
+---
+
+<div align="center">
+
+<img src="assets/ai-lead-qualification-architecture.png"
+     alt="AI Lead Qualification Engine Architecture - Validation, Interpretation, Structured Extraction, Scoring and Human Review"
+     width="1000">
+
+</div>
+
+<br>
 
 ---
 
@@ -147,6 +162,9 @@ ai-lead-qualification-engine/
 │   ├── rules.py
 │   └── ai_service.py
 │
+├── assets/
+│   └── ai-lead-qualification-architecture.png
+│
 ├── config/
 │   └── qualification-rules.json
 │
@@ -166,8 +184,6 @@ ai-lead-qualification-engine/
 ├── LICENSE
 └── .gitignore
 ```
-
-> `test_api.py` and `CONTRIBUTING.md` should be added as part of the final V1 completion steps if they are not yet present.
 
 ---
 
@@ -189,10 +205,13 @@ ai-lead-qualification-engine/
 
 - [x] Example lead payloads
 - [x] Business-logic tests
-- [x] GitHub Actions workflow
-- [ ] API endpoint tests
-- [ ] Architecture image
-- [ ] V1 GitHub Release
+- [x] API endpoint tests
+- [x] GitHub Actions automated testing
+- [x] Architecture image
+- [x] CONTRIBUTING.md
+- [x] MIT License
+- [x] Local application testing
+- [x] V1 GitHub Release
 
 ### Future Integrations
 
@@ -202,7 +221,13 @@ ai-lead-qualification-engine/
 - [ ] Production authentication
 - [ ] Production observability
 
-**V1 focuses on the qualification engine itself. External AI providers and CRM integrations are intentionally kept outside the core implementation.**
+### ✅ V1.0.0 Complete
+
+The first stable release is available here:
+
+**[AI Lead Qualification Engine v1.0.0 →](https://github.com/prashant6788/ai-lead-qualification-engine/releases/tag/v1.0.0)**
+
+V1 focuses on the qualification engine itself. External AI providers, CRM integrations and persistence are intentionally kept outside the core implementation.
 
 ---
 
@@ -584,21 +609,16 @@ Run all tests:
 python -m pytest -q
 ```
 
-Current business-logic tests cover:
+The test suite covers:
 
 - clearly qualified lead
 - ambiguous lead
 - commercial negotiation
 - lower-information lead
-
-Recommended API tests additionally cover:
-
-```text
-GET /health
-POST /qualify
-HTTP 422 validation
-Human-review response
-```
+- health endpoint
+- qualification endpoint
+- invalid API input
+- human-review API response
 
 Tests should be added whenever qualification behavior changes.
 
@@ -788,9 +808,21 @@ Contributions are welcome for:
 - provider integrations
 - security improvements
 
-Please read [CONTRIBUTING.md](CONTRIBUTING.md) before submitting a pull request.
+Please read **[CONTRIBUTING.md](CONTRIBUTING.md)** before submitting a pull request.
 
 Do not submit real customer data, API keys, credentials or fabricated performance claims.
+
+---
+
+# 📦 Release
+
+The first stable release is:
+
+### [v1.0.0 — AI Lead Qualification Engine](https://github.com/prashant6788/ai-lead-qualification-engine/releases/tag/v1.0.0)
+
+This release represents the completed V1 reference implementation.
+
+Future breaking changes should use a new major release. Smaller compatible improvements can be introduced through later minor or patch releases.
 
 ---
 
