@@ -2,15 +2,16 @@
 
 # 🤖 AI Lead Qualification Engine
 
-### Reference implementation for AI-assisted lead qualification
+### AI-Assisted Lead Qualification with Deterministic Rules & Human Review
 
-**Structured Extraction · Deterministic Scoring · Human Review · FastAPI**
+**Structured Extraction · Configurable Scoring · Human-in-the-Loop · FastAPI**
 
-A small, runnable reference implementation showing how AI-assisted interpretation can be combined with explicit qualification rules and human-review fallback.
+A runnable reference implementation showing how AI-assisted interpretation can be combined with explicit business rules to build a transparent, testable lead qualification workflow.
 
 [![Python](https://img.shields.io/badge/Python-3.10%2B-blue)](#requirements)
-[![FastAPI](https://img.shields.io/badge/FastAPI-API-green)](#api)
+[![FastAPI](https://img.shields.io/badge/FastAPI-REST%20API-009688)](#api)
 [![Tests](https://img.shields.io/badge/Tests-pytest-orange)](#testing)
+[![CI](https://img.shields.io/badge/CI-GitHub%20Actions-2088FF)](#testing)
 [![License](https://img.shields.io/badge/License-MIT-yellow)](LICENSE)
 
 **Maintained by [Prashant Rajput](https://github.com/prashant6788)**  
@@ -20,64 +21,84 @@ Founder, [Touchstone Infotech](https://www.touchstoneinfotech.com/)
 
 ---
 
-## What It Does
+> **V1 implementation note:** This version uses a deterministic local interpretation layer so the project can run without external AI credentials. The interpretation layer is designed to be replaceable with an LLM or other AI provider while keeping qualification policy and scoring deterministic.
 
-The engine accepts an inbound lead and returns a structured qualification result.
+---
+
+## 🚀 What It Does
+
+The engine accepts an inbound lead and returns a structured qualification decision.
 
 ```text
 Incoming Lead
-     ↓
-Validate Input
-     ↓
+      ↓
+Input Validation
+      ↓
 Interpret Requirement
-     ↓
+      ↓
 Structured Extraction
-     ↓
+      ↓
+Qualification Rules
+      ↓
 Deterministic Scoring
-     ↓
+      ↓
 Qualification Decision
- ┌───────┼──────────┐
-Qualified Review   Not Qualified
-    ↓       ↓             ↓
-Sales   Human /        Nurture
-Call    Clarify
+   ┌────────┼─────────┐
+   ↓        ↓         ↓
+Qualified Review  Not Qualified
+   ↓        ↓         ↓
+Sales    Human      Nurture
+Call     Review
 ```
 
-The project deliberately separates **interpretation** from **business policy**.
+The architecture deliberately separates **interpretation** from **business policy**.
 
-- Interpretation extracts information from unstructured input.
-- Deterministic rules calculate the score.
-- Human review handles ambiguity, unsupported requirements and commercial exceptions.
+- **Interpretation** extracts useful information from lead input.
+- **Rules** determine how that information contributes to qualification.
+- **Scoring** remains explicit and configurable.
+- **Human review** handles ambiguity and exceptions.
+- **API responses** provide structured results for downstream systems.
 
 ---
 
-## Why This Architecture?
+## 💡 Why This Architecture?
 
-A common mistake is asking an AI model to make an unrestricted decision such as:
+A common approach is to ask an AI model something like:
 
 > "Is this a good lead?"
 
-This project instead uses the safer pattern:
+That creates an important problem: the AI is being asked to both **interpret the lead** and **define the business decision**.
+
+This project separates those responsibilities.
 
 ```text
-AI / Interpreter
-↓
-Extract structured facts
-↓
+Interpreter
+     ↓
+Extract Structured Facts
+     ↓
 Validate
-↓
-Deterministic rules
-↓
-Decision
-↓
-Human fallback when needed
+     ↓
+Deterministic Business Rules
+     ↓
+Qualification Decision
+     ↓
+Human Review When Required
 ```
 
-This makes the workflow easier to test, explain and change.
+This makes the workflow easier to:
+
+- understand
+- test
+- audit
+- modify
+- integrate
+- govern
+
+AI can assist interpretation without becoming the uncontrolled source of business policy.
 
 ---
 
-## Architecture
+## 🏗️ Architecture
 
 ```mermaid
 flowchart LR
@@ -87,17 +108,36 @@ flowchart LR
     D --> E["Qualification Rules"]
     E --> F["Scoring"]
     F --> G{"Decision"}
+
     G -->|High Score| H["Qualified"]
     G -->|Ambiguous / Exception| I["Human Review"]
     G -->|Low Score| J["Nurture / Not Qualified"]
+
+    H --> K["Sales Action"]
+    I --> L["Human Decision"]
+    J --> M["Nurture / Close"]
 ```
+
+### Core Principle
+
+```text
+Interpretation ≠ Business Policy
+```
+
+The interpretation layer can change independently from the qualification rules.
+
+That means an external AI provider can later replace the local interpreter without requiring the entire qualification system to be redesigned.
 
 ---
 
-## Repository Structure
+## 📁 Repository Structure
 
 ```text
 ai-lead-qualification-engine/
+│
+├── .github/
+│   └── workflows/
+│       └── tests.yml
 │
 ├── app/
 │   ├── __init__.py
@@ -116,20 +156,65 @@ ai-lead-qualification-engine/
 │   └── unqualified-lead.json
 │
 ├── tests/
-│   └── test_qualification.py
+│   ├── test_qualification.py
+│   └── test_api.py
 │
 ├── .env.example
 ├── requirements.txt
 ├── README.md
+├── CONTRIBUTING.md
 ├── LICENSE
 └── .gitignore
 ```
 
+> `test_api.py` and `CONTRIBUTING.md` should be added as part of the final V1 completion steps if they are not yet present.
+
 ---
 
-## Qualification Model
+## ✅ V1 Status
 
-The default rules are intentionally simple and configurable.
+### Core Engine
+
+- [x] FastAPI REST API
+- [x] Structured lead input
+- [x] Pydantic validation
+- [x] Local interpretation layer
+- [x] Structured extraction
+- [x] Deterministic qualification scoring
+- [x] Configurable business rules
+- [x] Human-review fallback
+- [x] Qualified / Review / Not Qualified outcomes
+
+### Testing & Documentation
+
+- [x] Example lead payloads
+- [x] Business-logic tests
+- [x] GitHub Actions workflow
+- [ ] API endpoint tests
+- [ ] Architecture image
+- [ ] V1 GitHub Release
+
+### Future Integrations
+
+- [ ] External LLM provider
+- [ ] CRM integration
+- [ ] Database persistence
+- [ ] Production authentication
+- [ ] Production observability
+
+**V1 focuses on the qualification engine itself. External AI providers and CRM integrations are intentionally kept outside the core implementation.**
+
+---
+
+## 🎯 Qualification Model
+
+Qualification rules live in:
+
+```text
+config/qualification-rules.json
+```
+
+Default example:
 
 ```json
 {
@@ -156,30 +241,126 @@ The default rules are intentionally simple and configurable.
 
 These values are **illustrative configuration defaults**, not universal lead-scoring benchmarks.
 
----
+Every business should define qualification rules according to its own:
 
-## Human Review
-
-A lead is routed to review when, for example:
-
-- service interest is unclear
-- the message contains too little information
-- the request is unsupported
-- commercial negotiation is detected
-- a contractual exception is present
-
-The engine does not invent missing customer information to increase a score.
+- ICP
+- services
+- sales process
+- geography
+- commercial model
+- lead sources
+- operational capacity
 
 ---
+
+## 🧮 Example Scoring
+
+A complete lead could receive:
+
+| Signal | Score |
+|---|---:|
+| Supported service | 20 |
+| Clear requirement | 20 |
+| Budget available | 15 |
+| Timeline available | 15 |
+| Target location | 15 |
+| Business identified | 15 |
+| **Maximum** | **100** |
+
+Example thresholds:
+
+```text
+80–100  → Qualified
+50–79   → Review
+0–49    → Not Qualified / Nurture
+```
+
+A scoring threshold does **not** override an explicit human-review condition.
+
+For example, a lead could score highly but still require human review because of a commercial or contractual exception.
+
+---
+
+## 👤 Human Review
+
+Human review is a first-class part of the architecture.
+
+A lead may be routed to a human when:
+
+- service interest cannot be identified reliably
+- the requirement is ambiguous
+- insufficient information is available
+- an unsupported requirement is detected
+- custom pricing is requested
+- commercial negotiation is required
+- contractual discussion is detected
+- the workflow cannot confidently determine the next action
+
+Example:
+
+```text
+Lead Score = 100
+       +
+Commercial Exception Detected
+       ↓
+Human Review
+```
+
+A high score therefore does not automatically bypass exception handling.
+
+The engine also avoids inventing missing customer information simply to increase a qualification score.
+
+---
+
+## 📥 Example Lead
+
+```json
+{
+  "name": "Rahul Sharma",
+  "company": "Northstar Realty",
+  "email": "rahul@example.com",
+  "phone": "+919999999999",
+  "message": "We generate around 100 enquiries a month and need CRM automation and WhatsApp follow-up.",
+  "service_interest": "crm_automation",
+  "location": "Gurugram",
+  "budget": 50000,
+  "timeline": "30 days",
+  "lead_source": "google_ads"
+}
+```
+
+---
+
+## 📤 Example Result
+
+```json
+{
+  "qualification_status": "qualified",
+  "score": 100,
+  "service_interest": "crm_automation",
+  "requirement_summary": "We generate around 100 enquiries a month and need CRM automation and WhatsApp follow-up.",
+  "needs_human_review": false,
+  "review_reason": null,
+  "recommended_action": "book_sales_call",
+  "breakdown": {
+    "supported_service": 20,
+    "clear_requirement": 20,
+    "budget_available": 15,
+    "timeline_available": 15,
+    "target_location": 15,
+    "business_identified": 15
+  }
+}
+```
+
+---
+
+# ⚙️ Installation
 
 ## Requirements
 
 - Python 3.10+
 - pip
-
----
-
-## Installation
 
 Clone the repository:
 
@@ -188,13 +369,27 @@ git clone https://github.com/prashant6788/ai-lead-qualification-engine.git
 cd ai-lead-qualification-engine
 ```
 
-Create a virtual environment:
+---
+
+## Create a Virtual Environment
 
 ### Windows
 
-```bash
+```powershell
 python -m venv .venv
-.venv\Scripts\activate
+.\.venv\Scripts\Activate.ps1
+```
+
+If PowerShell blocks activation:
+
+```powershell
+Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope Process
+```
+
+Then activate again:
+
+```powershell
+.\.venv\Scripts\Activate.ps1
 ```
 
 ### macOS / Linux
@@ -204,33 +399,49 @@ python3 -m venv .venv
 source .venv/bin/activate
 ```
 
-Install dependencies:
+---
+
+## Install Dependencies
 
 ```bash
-pip install -r requirements.txt
+python -m pip install --upgrade pip
+python -m pip install -r requirements.txt
 ```
 
 ---
 
-## Run Locally
+# ▶️ Run Locally
+
+Start the API:
 
 ```bash
-uvicorn app.main:app --reload
+python -m uvicorn app.main:app --reload
 ```
 
-Then open:
+The API will run at:
+
+```text
+http://127.0.0.1:8000
+```
+
+Open the interactive FastAPI documentation:
 
 ```text
 http://127.0.0.1:8000/docs
 ```
 
-FastAPI will provide an interactive API interface.
+You should see:
+
+```text
+GET  /health
+POST /qualify
+```
 
 ---
 
-## API
+# 🔌 API
 
-### Health Check
+## Health Check
 
 ```http
 GET /health
@@ -244,7 +455,9 @@ Response:
 }
 ```
 
-### Qualify Lead
+---
+
+## Qualify Lead
 
 ```http
 POST /qualify
@@ -288,32 +501,45 @@ Example response:
 
 ---
 
-## Try an Example With curl
+## Invalid Input
 
-```bash
-curl -X POST "http://127.0.0.1:8000/qualify" \
-  -H "Content-Type: application/json" \
-  -d @examples/qualified-lead.json
+FastAPI automatically validates the request using Pydantic.
+
+Invalid input returns:
+
+```text
+HTTP 422
 ```
 
-On Windows PowerShell, you may prefer FastAPI's `/docs` interface.
+This prevents malformed lead data from reaching the qualification logic.
 
 ---
 
-## Interpretation Layer
+# 🧠 Interpretation Layer
 
-V1 uses an offline deterministic `HeuristicAIService`.
+V1 uses the local:
 
-This is intentional:
+```text
+HeuristicAIService
+```
 
-- the repository works without paid API credentials
+defined in:
+
+```text
+app/ai_service.py
+```
+
+Despite the class name, V1 does **not require an external AI model**.
+
+This design is intentional because it means:
+
+- the repository runs without paid API credentials
 - tests remain deterministic
-- visitors can run the project immediately
-- the AI/provider integration remains replaceable
+- anyone can run the project immediately
+- no external AI dependency is required
+- the interpretation layer remains replaceable
 
-For a production implementation, `app/ai_service.py` can be replaced with a provider-specific structured extraction service.
-
-Keep the same output contract:
+The interpretation layer returns structured information such as:
 
 ```json
 {
@@ -327,44 +553,102 @@ Keep the same output contract:
 }
 ```
 
-Downstream business rules should continue to validate the result.
+A future LLM integration should maintain this structured contract.
+
+The qualification engine can then continue applying deterministic business rules regardless of which interpretation provider is used.
 
 ---
 
-## Configuration
+# 🔄 AI vs Rules vs Humans
 
-Change scoring and supported services in:
+The architecture intentionally gives each layer a different responsibility.
 
-```text
-config/qualification-rules.json
-```
+| Layer | Responsibility |
+|---|---|
+| Interpretation | Understand unstructured lead information |
+| Structured Output | Convert interpretation into defined fields |
+| Rules | Apply business qualification policy |
+| Scoring | Calculate explicit qualification score |
+| Human | Handle ambiguity and exceptions |
+| API | Return structured outcome to downstream systems |
 
-This keeps business policy separate from application code.
+This separation reduces unnecessary dependence on probabilistic model behavior.
 
 ---
 
-## Testing
+# 🧪 Testing
 
-Run:
+Run all tests:
 
 ```bash
-pytest
+python -m pytest -q
 ```
 
-The included tests cover:
+Current business-logic tests cover:
 
 - clearly qualified lead
 - ambiguous lead
 - commercial negotiation
 - lower-information lead
 
-Add tests whenever qualification rules change.
+Recommended API tests additionally cover:
+
+```text
+GET /health
+POST /qualify
+HTTP 422 validation
+Human-review response
+```
+
+Tests should be added whenever qualification behavior changes.
 
 ---
 
-## Security
+## 🔁 Continuous Integration
 
-Do not commit real credentials.
+The repository includes:
+
+```text
+.github/workflows/tests.yml
+```
+
+GitHub Actions is configured to test against:
+
+```text
+Python 3.10
+Python 3.11
+Python 3.12
+```
+
+on pushes and pull requests to `main`.
+
+This helps verify that changes do not break the qualification engine.
+
+---
+
+# 🔧 Configuration
+
+Business rules should be changed in:
+
+```text
+config/qualification-rules.json
+```
+
+rather than being scattered throughout application code.
+
+This allows teams to modify:
+
+- supported services
+- scoring weights
+- qualification thresholds
+
+without redesigning the API.
+
+---
+
+# 🔐 Security
+
+Never commit real credentials.
 
 The repository includes:
 
@@ -372,92 +656,169 @@ The repository includes:
 .env.example
 ```
 
-but `.env` files are ignored.
+while local `.env` files are ignored by Git.
 
-For a production system, also consider:
+For production implementations, also consider:
 
-- authentication
+- API authentication
+- authorization
 - rate limiting
-- request logging policy
+- webhook verification
 - PII minimization
+- encryption
 - secret management
 - CRM permission scope
-- webhook verification
-- monitoring and alerting
+- request logging policy
+- monitoring
+- alerting
+- retention policies
+
+Real customer data should not be committed to the repository.
 
 ---
 
-## Limitations
+# ⚠️ Limitations
 
-This project is a **reference implementation**, not a production CRM product.
+This repository is a **reference implementation**, not a production CRM or autonomous sales system.
 
 V1 intentionally does not include:
 
+- external LLM API
 - CRM authentication
 - GoHighLevel integration
 - WhatsApp integration
 - database persistence
 - user accounts
-- frontend UI
-- external model API
+- frontend application
+- production authentication
 - production observability
 
-Those can be added as separate integrations without changing the core separation between extraction, rules and human review.
+These can be implemented as separate integration layers without changing the fundamental architecture.
 
 ---
 
-## Related Frameworks
+# 🛣️ Potential Future Extensions
 
-### 🤖 AI Automation Playbooks
+Useful future extensions could include:
 
-[github.com/prashant6788/ai-automation-playbooks](https://github.com/prashant6788/ai-automation-playbooks)
+```text
+External LLM
+     ↓
+Structured Extraction
+     ↓
+Qualification Engine
+     ↓
+CRM
+     ↓
+Lead Routing
+     ↓
+Sales Workflow
+```
 
-Useful related resources:
+Possible additions:
+
+- OpenAI or other LLM structured extraction
+- CRM webhook integration
+- lead-routing engine
+- configurable ICP profiles
+- database persistence
+- audit history
+- API authentication
+- observability
+- CRM outcome feedback
+
+Future functionality should be added only where it provides meaningful implementation value.
+
+---
+
+# 🔗 Related Frameworks
+
+## 🤖 AI Automation Playbooks
+
+**[Explore AI Automation Playbooks →](https://github.com/prashant6788/ai-automation-playbooks)**
+
+Related resources include:
 
 - AI Lead Qualification Framework
 - AI Workflow Design Framework
 - AI Agent Human Handoff Framework
 - AI Automation QA Checklist
+- AI Automation Measurement Framework
 
-### 🔄 CRM Automation Frameworks
+---
 
-[github.com/prashant6788/crm-automation-frameworks](https://github.com/prashant6788/crm-automation-frameworks)
+## 🔄 CRM Automation Frameworks
 
-Useful related resources:
+**[Explore CRM Automation Frameworks →](https://github.com/prashant6788/crm-automation-frameworks)**
+
+Related resources include:
 
 - CRM Strategy Framework
+- Lead Lifecycle Framework
 - CRM Lead Routing Framework
 - CRM Pipeline Design Framework
 - CRM Automation QA Checklist
 
 ---
 
-## Design Principles
+# 🧭 Design Principles
 
 1. **Extract facts before making decisions.**
-2. **Keep business policy deterministic where possible.**
-3. **Do not invent missing lead data.**
-4. **Use structured outputs.**
-5. **Make rules configurable.**
-6. **Route ambiguity to humans.**
-7. **Keep the system testable without external APIs.**
-8. **Separate interpretation from CRM actions.**
+2. **Keep interpretation separate from business policy.**
+3. **Keep qualification rules explicit and testable.**
+4. **Do not invent missing lead information.**
+5. **Prefer structured outputs.**
+6. **Make business rules configurable.**
+7. **Route ambiguity and exceptions to humans.**
+8. **Keep the core system runnable without external APIs.**
+9. **Separate qualification from downstream CRM actions.**
+10. **Test changes to qualification behavior.**
 
 ---
 
-## License
+# 🤝 Contributing
 
-The software is released under the [MIT License](LICENSE).
+Contributions are welcome for:
+
+- qualification logic improvements
+- additional tests
+- validation
+- documentation
+- human-review patterns
+- provider integrations
+- security improvements
+
+Please read [CONTRIBUTING.md](CONTRIBUTING.md) before submitting a pull request.
+
+Do not submit real customer data, API keys, credentials or fabricated performance claims.
+
+---
+
+# 📄 License
+
+This software is released under the [MIT License](LICENSE).
 
 ---
 
 <div align="center">
 
-### AI Lead Qualification Engine
+## 🤖 AI Lead Qualification Engine
 
 **Interpretation → Structured Data → Rules → Qualification → Human Review**
 
+A practical reference implementation for building more transparent and testable AI-assisted revenue workflows.
+
+<br>
+
 Maintained by **[Prashant Rajput](https://github.com/prashant6788)**  
 Founder, **[Touchstone Infotech](https://www.touchstoneinfotech.com/)**
+
+<br>
+
+[AI Automation Playbooks](https://github.com/prashant6788/ai-automation-playbooks)
+·
+[CRM Automation Frameworks](https://github.com/prashant6788/crm-automation-frameworks)
+·
+[GitHub Profile](https://github.com/prashant6788)
 
 </div>
