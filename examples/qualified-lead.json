@@ -1,0 +1,12 @@
+{
+  "name": "Rahul Sharma",
+  "company": "Northstar Realty",
+  "email": "rahul@example.com",
+  "phone": "+919999999999",
+  "message": "We generate around 100 enquiries a month and need CRM automation and WhatsApp follow-up.",
+  "service_interest": "crm_automation",
+  "location": "Gurugram",
+  "budget": 50000,
+  "timeline": "30 days",
+  "lead_source": "google_ads"
+}

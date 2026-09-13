@@ -1,0 +1,20 @@
+{
+  "supported_services": [
+    "seo",
+    "crm_automation",
+    "ai_automation",
+    "paid_media"
+  ],
+  "scoring": {
+    "supported_service": 20,
+    "clear_requirement": 20,
+    "budget_available": 15,
+    "timeline_available": 15,
+    "target_location": 15,
+    "business_identified": 15
+  },
+  "thresholds": {
+    "qualified": 80,
+    "human_review": 50
+  }
+}
