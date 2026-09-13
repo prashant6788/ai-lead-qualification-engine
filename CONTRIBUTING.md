@@ -1,6 +1,17 @@
 # Contributing to AI Lead Qualification Engine
 
-Thanks for your interest in contributing.
+Thanks for your interest in contributing to **AI Lead Qualification Engine**.
+
+This project is a reference implementation for building transparent and testable AI-assisted lead qualification systems using:
+
+- structured lead input
+- deterministic qualification rules
+- configurable scoring
+- human-review fallback
+- FastAPI
+- automated testing
+
+---
 
 ## Development Setup
 
